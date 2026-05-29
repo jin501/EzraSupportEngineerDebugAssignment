@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Support Engineer Challenge</title>
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; margin: 24px; }
+    .row { display:flex; gap:12px; align-items:center; flex-wrap: wrap; }
+    input, button, select { padding: 8px; font-size: 14px; }
+    table { border-collapse: collapse; width: 100%; margin-top: 16px; }
+    th, td { border-bottom: 1px solid #eee; text-align: left; padding: 10px; }
+    .muted { color: #666; font-size: 12px; }
+    .error { color: #b00020; white-space: pre-wrap; }
+    code { background:#f6f6f6; padding:2px 4px; border-radius: 4px; }
+  </style>
+</head>
+<body>
+  <h1>Task Tracker</h1>
+  <p class="muted">
+    This UI is intentionally minimal and may contain bugs. Use it to reproduce customer reports.
+  </p>
+
+  <div class="row">
+    <label>User:
+      <select id="userSelect">
+        <option value="user-001">user-001</option>
+        <option value="user-002">user-002</option>
+        <option value="user-003">user-003</option>
+        <option value="user-004">user-004</option>
+        <option value="user-005">user-005</option>
+      </select>
+    </label>
+
+    <label>New task:
+      <input id="titleInput" placeholder="e.g. Follow up with customer"/>
+    </label>
+
+    <button id="addBtn">Add</button>
+    <button id="refreshBtn">Refresh</button>
+
+    <span class="muted">Tip: try refreshing a few times.</span>
+  </div>
+
+  <div id="error" class="error"></div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Title</th>
+        <th>Status</th>
+        <th>Created</th>
+      </tr>
+    </thead>
+    <tbody id="tbody"></tbody>
+  </table>
+
+  <script src="main.js"></script>
+</body>
+</html>

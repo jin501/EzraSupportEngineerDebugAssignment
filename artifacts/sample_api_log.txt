@@ -1,0 +1,11 @@
+info: Microsoft.Hosting.Lifetime[14]
+      Now listening on: http://localhost:5088
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: SupportEngineerChallenge.Api.Program[0]
+      CreateTask request UserId=user-001 Title=Buy groceries X-Client-Timestamp present=False length=0
+fail: Microsoft.AspNetCore.Server.Kestrel[13]
+      Connection id "0HN...", Request id "0HN...:00000001": An unhandled exception was thrown by the application.
+System.FormatException: String '' was not recognized as a valid DateTime.
+   at System.DateTime.Parse(String s)
+   at SupportEngineerChallenge.Api.Endpoints.TaskEndpoints.<>c.AnonymousMethod__1(HttpContext ctx, CreateTaskRequest req, AppDbContext db, ILogger`1 logger) in .../TaskEndpoints.cs:line 44

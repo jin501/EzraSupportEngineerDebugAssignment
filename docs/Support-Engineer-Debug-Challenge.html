@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Support Engineer Debug Challenge</title>
+  <style>
+    body { font-family: Georgia, serif; max-width: 700px; margin: 2rem auto; padding: 0 1.5rem; line-height: 1.5; color: #222; }
+    h1 { font-size: 1.6rem; border-bottom: 1px solid #ccc; padding-bottom: 0.3rem; }
+    h2 { font-size: 1.2rem; margin-top: 1.5rem; }
+    h3 { font-size: 1.05rem; margin-top: 1rem; }
+    code { background: #f5f5f5; padding: 0.15em 0.4em; border-radius: 3px; font-size: 0.9em; }
+    pre { background: #f5f5f5; padding: 1rem; overflow-x: auto; border-radius: 4px; font-size: 0.85rem; }
+    pre code { background: none; padding: 0; }
+    ul { margin: 0.5rem 0; }
+    li { margin: 0.25rem 0; }
+    hr { border: none; border-top: 1px solid #ddd; margin: 1.5rem 0; }
+    strong { font-weight: 600; }
+    .pdf-note { font-size: 0.9rem; color: #666; margin-bottom: 1.5rem; padding: 0.5rem; background: #f9f9f9; border-radius: 4px; }
+    @media print { body { max-width: none; } .pdf-note { display: none; } }
+  </style>
+</head>
+<body>
+
+<p class="pdf-note">To save as PDF: File → Print → Save as PDF (or choose “Save as PDF” as the destination).</p>
+
+<h1>Support Engineer Debug Challenge</h1>
+
+<h2>Overview</h2>
+<p>This exercise is designed to simulate real Support Engineering work: <strong>triage → reproduce → diagnose → fix safely → communicate clearly</strong>.</p>
+<p>You'll work in a small, prebuilt application that has a few realistic "production" issues. Your job is to investigate and ship fixes, plus the operational artifacts we'd expect from someone supporting production software.</p>
+<ul>
+  <li><strong>Timebox:</strong> ~2–4 hours (please don't spend more unless you want to and just note it if you do)</li>
+  <li><strong>AI tools:</strong> Allowed. Please be prepared to explain every change and the reasoning behind it.</li>
+</ul>
+
+<hr>
+
+<h2>Scenario</h2>
+<p>Assume this app is running in production and you're on call. We've received customer reports:</p>
+<ol>
+  <li><strong>"Sometimes creating a task fails with a 500."</strong></li>
+  <li><strong>"The tasks list is slow for some users."</strong></li>
+  <li><strong>"We've seen tasks appear duplicated or out of order after refresh."</strong></li>
+  <li><strong>"We're seeing 500 errors on task creation in production but cannot reproduce in our environment. Engineering has attached a log snippet from a failed request (see <code>artifacts/sample_api_log.txt</code>). Please use the logs to identify the cause and fix it."</strong></li>
+</ol>
+<p>Not all reports may be accurate and part of the exercise is determining what's real, what's reproducible, and what you'd do next.</p>
+<p><strong>Important:</strong> At least one issue (in particular the create-task 500) is intended to be diagnosed <strong>using the provided log artifacts</strong>. You should inspect stack traces, request context, and structured log lines in <code>artifacts/</code> to find the root cause before implementing a fix. The runbook you write should describe how to use logs in production to diagnose these issues.</p>
+
+<hr>
+
+<h2>Repo</h2>
+<p><strong>Repository:</strong> https://github.com/AlexFH100/SupportEngineerDebugAssignment</p>
+
+<h3>What's included</h3>
+<ul>
+  <li>.NET 8 API + SQLite database</li>
+  <li>Minimal UI served by the API</li>
+  <li>Small test suite (some tests may fail initially)</li>
+  <li>Templates for deliverables: <code>RUNBOOK.md</code> (update this), <code>INCIDENT.md</code> (fill this in), <code>TICKET.md</code> (write a follow-up ticket)</li>
+  <li><strong><code>artifacts/</code></strong> folder with <strong>log snippets and context</strong> (e.g. <code>sample_api_log.txt</code>, <code>sample_slow_list_log.txt</code>, <code>customer_report.md</code>). Use these logs to diagnose at least one of the issues.</li>
+</ul>
+
+<h3>Getting started</h3>
+<p><strong>Requirements</strong></p>
+<ul><li>.NET SDK 8.x</li></ul>
+<p><strong>Run the API + UI</strong></p>
+<p>From the API project directory:</p>
+<pre><code>dotnet restore
+dotnet run</code></pre>
+<p>You'll see output like "Now listening on: …" with the port. It may be 5000 or another port depending on your environment.</p>
+<p><strong>Open the app</strong></p>
+<ul>
+  <li><strong>UI:</strong> http://localhost:&lt;PORT&gt;/</li>
+  <li><strong>Swagger:</strong> http://localhost:&lt;PORT&gt;/swagger</li>
+</ul>
+<p><strong>Run tests</strong></p>
+<p>From the repo root:</p>
+<pre><code>dotnet test</code></pre>
+
+<hr>
+
+<h2>Your tasks</h2>
+
+<h3>1) Triage &amp; reproduction</h3>
+<ul>
+  <li>Get the app running locally</li>
+  <li><strong>Use the provided log artifacts</strong> (e.g. <code>artifacts/sample_api_log.txt</code>) to diagnose at least one issue — document what you found in the logs and how it led to the fix</li>
+  <li>Determine which issues you can reproduce</li>
+  <li>Write clear repro steps for each confirmed issue</li>
+  <li>Capture useful evidence (logs, stack traces, screenshots, etc.)</li>
+</ul>
+
+<h3>2) Root cause analysis</h3>
+<p>For each confirmed issue, explain briefly:</p>
+<ul>
+  <li>What is happening</li>
+  <li>Why it is happening (root cause)</li>
+  <li>What you considered / ruled out (short)</li>
+</ul>
+
+<h3>3) Fixes (keep them safe &amp; minimal)</h3>
+<ul>
+  <li>Implement fixes for the issues you confirm</li>
+  <li>Add or update tests where appropriate</li>
+  <li>If something is too big to fix in time, document what you found and propose next steps</li>
+</ul>
+
+<h3>4) Operational thinking: update the runbook</h3>
+<p>Update <code>RUNBOOK.md</code> with:</p>
+<ul>
+  <li><strong>How to diagnose these issues in production</strong> (what to look at, what logs/queries/metrics help — use the structured log lines and sample artifacts as a guide)</li>
+  <li>How to verify the fix</li>
+  <li>Mitigation / rollback plan if the fix regresses</li>
+</ul>
+
+<h3>5) Incident summary</h3>
+<p>Fill in <code>INCIDENT.md</code> like an internal incident write-up: Impact, Detection, Timeline (rough is fine), Root cause, Mitigation/resolution, Verification, Follow-up actions.</p>
+
+<h3>6) Create a follow-up ticket</h3>
+<p>Write <code>TICKET.md</code> with one strong follow-up ticket you would file after the incident is resolved. Include: Title + description, Priority/severity and rationale, Acceptance criteria, Notes/context (monitoring, tests, refactors, etc.).</p>
+
+<hr>
+
+<h2>Submission (Clone + Link)</h2>
+<p>Please submit using Clone + Link:</p>
+<ol>
+  <li>Clone this repository into your own GitHub account.</li>
+  <li>Create a branch (any name is fine).</li>
+  <li>Make your changes and commit them.</li>
+  <li>Push the branch to your GitHub account (create a new repo under your account for the push, if needed).</li>
+  <li>Email us: A link to your GitHub repo and the branch you worked on; a brief note covering: Which issues you confirmed and fixed, <strong>How you used logs to diagnose at least one issue</strong>, Any tradeoffs you made, What you would do next with more time.</li>
+</ol>
+<p>Send to: <strong>alex.stiglick@functionhealth.com</strong></p>
+
+<hr>
+
+<h2>What we evaluate</h2>
+<p>We're less interested in perfect code and more interested in how you operate. We look for:</p>
+<ul>
+  <li>Clear reproduction steps + evidence</li>
+  <li><strong>Use of log artifacts to diagnose issues (stack traces, structured log lines, request context)</strong></li>
+  <li>Hypothesis-driven debugging (not random poking)</li>
+  <li>Safe fixes (minimal blast radius, sensible defaults, rollback awareness)</li>
+  <li>Verification quality (tests + practical manual verification)</li>
+  <li>Operational artifacts (runbook + incident summary + a strong ticket)</li>
+  <li>Ability to explain decisions and tradeoffs (including any AI-assisted parts)</li>
+</ul>
+
+<hr>
+
+<h2>Notes</h2>
+<ul>
+  <li>First run may be noisy because the app seeds data.</li>
+  <li>The port may differ from examples — trust the <code>dotnet run</code> output.</li>
+  <li>If you get blocked on setup, write down what you tried since that's still a useful signal.</li>
+</ul>
+
+<h2>Questions / help</h2>
+<p>If you're stuck on environment setup or something doesn't make sense, email: <strong>alex.stiglick@functionhealth.com</strong></p>
+
+</body>
+</html>
