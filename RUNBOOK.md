@@ -32,9 +32,33 @@ dotnet test
 ## Troubleshooting checklist (starter)
 
 ### “Create task fails with 500”
-- Check API logs in console.
-- Verify request payload and headers.
-- Look for unhandled exceptions in `POST /api/tasks`.
+
+Symptoms:
+- Users report intermittent failures when creating tasks.
+- Browser DevTools shows `POST /api/tasks` returning HTTP 500.
+
+Diagnosis:
+1. Review `artifacts/sample_api_log.txt` or equivalent production logs.
+2. Look for the structured log line:
+   `CreateTask request UserId=... X-Client-Timestamp present=False length=0`
+3. Review the accompanying stack trace showing:
+   `System.FormatException: String '' was not recognized as a valid DateTime`
+4. Confirm the exception originates from `DateTime.Parse()` in `TaskEndpoints.cs`.
+5. Compare successful vs failed `POST /api/tasks` requests in DevTools if reproducing locally.
+
+Root cause:
+- The endpoint was parsing `X-Client-Timestamp` with `DateTime.Parse()` without safely handling missing or invalid values.
+
+Fix:
+- Use `DateTime.TryParse()`.
+- Default missing timestamp to `DateTime.UtcNow`.
+- Return HTTP 400 for malformed timestamps instead of HTTP 500.
+
+Verification:
+- Create task with valid timestamp.
+- Create task without timestamp.
+- Create task with invalid timestamp.
+- Confirm no 500s occur.
 
 ### “Tasks list is slow”
 - Confirm dataset size (seed can be large).
