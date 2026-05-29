@@ -58,3 +58,22 @@ Final fix:
 - [ ] Add request validation coverage for task creation endpoints.
 - [ ] Add monitoring/alerting for elevated HTTP 500 rates on POST /api/tasks.
 - [ ] Review other endpoints for unsafe parsing or unvalidated user input.
+
+
+## Additional Finding: Slow Task List Performance
+
+Impact:
+- Users with larger task datasets experienced significantly slower response times.
+
+Detection:
+- Diagnosed using `artifacts/sample_slow_list_log.txt`, which showed requests returning 200 records taking substantially longer than smaller requests.
+
+Root Cause:
+- The endpoint retrieved all tasks from the database before applying filtering, sorting, and limits in memory.
+
+Resolution:
+- Moved filtering, sorting, and limiting into the database query so only the required rows are retrieved.
+
+Verification:
+- Verified generated SQL contains `WHERE`, `ORDER BY`, and `LIMIT`.
+- Local testing showed task list requests completing in single-digit milliseconds after the change.

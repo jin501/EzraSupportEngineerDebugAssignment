@@ -61,9 +61,39 @@ Verification:
 - Confirm no 500s occur.
 
 ### “Tasks list is slow”
-- Confirm dataset size (seed can be large).
-- Inspect how the list endpoint fetches and filters data.
-- Review query patterns and database usage.
+
+Symptoms:
+- Some users report task lists loading significantly slower than others.
+- Performance degradation becomes more noticeable for users with larger task counts.
+
+Diagnosis:
+1. Review `artifacts/sample_slow_list_log.txt`.
+2. Compare `elapsedMs` across different users and limits.
+3. Check whether filtering and limiting are being performed in the database query or in application memory.
+4. Enable SQL logging and verify generated SQL contains:
+   - `WHERE UserId = ...`
+   - `ORDER BY`
+   - `LIMIT`
+
+Evidence:
+- The provided artifact showed:
+  - `user-001 limit=50 elapsedMs=312`
+  - `user-002 limit=50 elapsedMs=289`
+  - `user-015 limit=200 elapsedMs=1847`
+- This suggested the endpoint was processing more data than necessary before applying filters.
+
+Root cause:
+- The endpoint loaded the entire Tasks table into memory using `ToListAsync()` before filtering by user and applying limits.
+- As data volume increased, response times increased unnecessarily.
+
+Fix:
+- Moved filtering, ordering, and limiting into the database query.
+- Retained `AsNoTracking()` for read-only operations.
+
+Verification:
+- Confirm generated SQL contains `WHERE`, `ORDER BY`, and `LIMIT`.
+- Re-run task list requests and compare elapsed times.
+- Verify only the requested user's tasks are returned.
 
 ### “Duplicates / wrong order after refresh”
 - Compare API response vs UI rendering.
@@ -79,3 +109,10 @@ Verification:
 - Roll back to last known good version.
 - Temporarily disable problematic client behavior (feature flag / UI change).
 - Add guardrails (e.g. input validation, error handling) to prevent unhandled exceptions.
+
+## Testing Notes
+
+- API project builds and runs successfully.
+- Test project compilation issues were resolved (`using Xunit`).
+- Test execution remains blocked by a FluentAssertions runtime dependency resolution issue (`FluentAssertions 6.12.0`) despite package restore and reinstall attempts.
+- Core fixes were verified manually through the UI and API endpoints.
