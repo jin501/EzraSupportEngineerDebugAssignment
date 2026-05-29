@@ -19,6 +19,7 @@ public static class TaskEndpoints
                 .AsNoTracking()
                 .Where(t => t.UserId == userId)
                 .OrderByDescending(t => t.CreatedAt)
+                .ThenByDescending(t => t.Id)
                 .Take(Math.Clamp(limit ?? 50, 1, 200))
                 .ToListAsync();
 

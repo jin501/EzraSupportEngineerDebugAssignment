@@ -96,19 +96,62 @@ Verification:
 - Verify only the requested user's tasks are returned.
 
 ### “Duplicates / wrong order after refresh”
-- Compare API response vs UI rendering.
-- Check the UI state update logic during refresh.
-- Verify how the list is merged and ordered.
 
-## Verification steps (starter)
-- Create tasks from UI and via Swagger.
-- Refresh tasks repeatedly; confirm no duplicates and ordering is correct.
-- Validate list endpoint returns only requested user's tasks.
+Symptoms:
 
-## Rollback / mitigation ideas (starter)
-- Roll back to last known good version.
-- Temporarily disable problematic client behavior (feature flag / UI change).
-- Add guardrails (e.g. input validation, error handling) to prevent unhandled exceptions.
+* Users reported seeing duplicate tasks after refreshing the task list.
+* Task ordering occasionally appeared inconsistent after repeated refreshes.
+
+Diagnosis:
+
+1. Reproduced the issue by repeatedly clicking the Refresh button in the UI.
+2. Initially investigated the backend list endpoint because unstable ordering can be caused by API-side sorting issues.
+3. Verified the API was returning the expected records and implemented a stable database query using filtering, ordering, and limits.
+4. After the backend fix, duplicate tasks still appeared in the UI.
+5. Reviewed the frontend refresh logic and found that fetched tasks were being appended to existing state using:
+
+   ```js
+   state.tasks = state.tasks.concat(items)
+   ```
+6. Each refresh added the latest API response to the existing task list, causing duplicate entries to accumulate over time.
+
+Root Cause:
+
+* The frontend refresh logic merged newly fetched tasks into the existing task list rather than replacing the current state.
+* Repeated refreshes caused the same tasks to be displayed multiple times.
+
+Fix:
+
+* Replaced state concatenation with state replacement during refresh.
+* The task list now reflects the latest API response instead of accumulating duplicate entries.
+* Backend ordering was also made deterministic to ensure consistent task ordering across refreshes.
+
+Verification:
+
+* Loaded the task list for multiple users.
+* Clicked Refresh repeatedly.
+* Confirmed task counts remain stable.
+* Confirmed no duplicate rows appear after refresh.
+* Confirmed task ordering remains consistent across repeated refreshes.
+
+```
+
+## Verification steps
+
+- Create tasks from the UI and via Swagger.
+- Create tasks with valid, missing, and invalid timestamp values.
+- Refresh task lists repeatedly and confirm no duplicate rows appear.
+- Verify task ordering remains consistent across refreshes.
+- Verify list endpoint returns only the requested user's tasks.
+- Verify task list performance remains acceptable for larger result sets.
+
+## Rollback / mitigation
+
+- Roll back to the previous application version if regressions are detected.
+- Temporarily disable the Refresh functionality if duplicate rendering is observed in production.
+- Revert frontend state handling changes and redeploy the last known good version.
+- Continue monitoring task creation failures, task list latency, and UI rendering behavior after deployment.
+```
 
 ## Testing Notes
 
